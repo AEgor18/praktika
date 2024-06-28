@@ -28,11 +28,13 @@ def hh_jobs(last_page):
     jobs = []
     for page in range(last_page):
         result = requests.get(f'{url}&page=0', headers=headers)
-        print(result.status_code)
+        # print(result.status_code)
         soup = bs(result.text, 'html.parser')
         results = soup.find_all('div',  {'class': 'vacancy-search-item__card'})
         for result in results:
-            print(result.find('a').text)
+            title = result.find('a').text
+            company = result.find('div', {'class': 'info-section--N695JG77kqwzxWAnSePt'}).find('span').text
+            print(title, company)
 
-    return jobs
+    return title
 hh_jobs(max_page)
