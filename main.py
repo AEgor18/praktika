@@ -10,3 +10,4 @@ request = requests.get(url, headers=headers)
 # print(request.status_code)
 soup = bs(request.text, 'html.parser')
 # paginator = soup.find('span', {'class': ''})
+#
