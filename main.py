@@ -1,16 +1,12 @@
-# This is a sample Python script.
+from bs4 import BeautifulSoup as bs
+import requests
 
-# Press Shift+F10 to execute it or replace it with your code.
-# Press Double Shift to search everywhere for classes, files, tool windows, actions, and settings.
-
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press Ctrl+F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+headers = {
+    'Host': 'hh.ru',
+    'User-Agent': 'Yandex'
+}
+url = 'https://hh.ru/search/vacancy?text=python&items_on_page=100'
+request = requests.get(url, headers=headers)
+# print(request.status_code)
+soup = bs(request.text, 'html.parser')
+# paginator = soup.find('span', {'class': ''})
