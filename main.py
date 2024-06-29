@@ -26,12 +26,12 @@ def hh():
 max_page = hh()
 
 def hh_jobs(last_page):
-    jobs = []
     for page in range(last_page):
         result = requests.get(f'{url}&page={page}', headers=headers)
         # print(result.status_code)
         soup = bs(result.text, 'lxml')
         results = soup.find_all('div',  {'class': 'vacancy-search-item__card'})
+        print(results)
         for result in results:
             try:
                 title = result.find('a').text
@@ -41,5 +41,5 @@ def hh_jobs(last_page):
                 salary = result.find('span', {'class': 'bloko-text'}).find('span', {'class': 'fake-magritte-primary-text--Hdw8FvkOzzOcoR4xXWni'}).text
                 print(title, company, experience, city, salary)
             except:
-                pass
-hh_jobs(max_page)
+                print(title, company, experience, city, 'По результатам собеседования')
+hh_jobs(1)
