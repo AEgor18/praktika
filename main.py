@@ -34,7 +34,8 @@ def hh_jobs(last_page):
         for result in results:
             title = result.find('a').text
             company = result.find('div', {'class': 'info-section--N695JG77kqwzxWAnSePt'}).find('span').text
-            print(title, company)
+            experience = result.find('span', {'class': 'label--rWRLMsbliNlu_OMkM_D3'}).text
+            city = result.find('div', {'class': 'info-section--N695JG77kqwzxWAnSePt'}).find('div', {'class': 'wide-container--lnYNwDTY2HXOzvtbTaHf'}).find('span').text
+            print(title, company, experience, city)
 
-    return title
 hh_jobs(max_page)
