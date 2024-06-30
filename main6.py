@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup as bs
 import requests
 
-text = 'Backend разработчик - Python (FastAPI) / Golang'
-items = 30
+text = 'python'
+items = 50
 headers = {
     'Host': 'hh.ru',
     'User-Agent': 'Yandex',
@@ -10,7 +10,7 @@ headers = {
     'Connection': 'keep-alive',
     'Accept-Encoding': 'gzip, deflate, br'
 }
-
+url = 'https://hh.ru/search/vacancy?L_save_area=true&text=python&excluded_text=&salary=&currency_code=RUR&experience=doesNotMatter&order_by=relevance&search_period=0&items_on_page=100&hhtmFrom=vacancy_search_filter'
 # def hh():
 #     request = requests.get(url, headers=headers)
 #     # print(request.status_code)
@@ -28,8 +28,6 @@ headers = {
 
 
 def get_url():
-    # for page in range(max_page):
-    url = f'https://hh.ru/search/vacancy?text={text}&salary=&ored_clusters=true&items_on_page={items}&hhtmFrom=vacancy_search_list&hhtmFromLabel=vacancy_search_line'
     request = requests.get(url, headers=headers)
     soup = bs(request.text, 'lxml')
     data = soup.find_all('div',  {'class': 'vacancy-search-item__card'})
