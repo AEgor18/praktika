@@ -20,7 +20,6 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS vacancies (
                 address VARCHAR(255)
                 )""")
 
-
 text = 'python'
 
 headers = {
@@ -76,9 +75,9 @@ def array():
                 address = address1_element.find('span').text if address1_element else None
             yield position, company, experience.replace('Требуемый опыт работы:', ''), salary, schedule, address
 
-for item in array():
-    position, company, experience, salary, schedule, address = item
-    mycursor.execute("INSERT INTO vacancies (position, company, experience, salary, schedule, address) VALUES (%s, %s, %s, %s, %s, %s)",
-                   (position, company, experience, salary, schedule, address))
-# mycursor.execute("DELETE FROM vacancies")
+# for item in array():
+#     position, company, experience, salary, schedule, address = item
+#     mycursor.execute("INSERT INTO vacancies (position, company, experience, salary, schedule, address) VALUES (%s, %s, %s, %s, %s, %s)",
+#                    (position, company, experience, salary, schedule, address))
+mycursor.execute("DELETE FROM vacancies")
 mydb.commit()
