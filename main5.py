@@ -66,7 +66,10 @@ def array():
             description = data.find_all('p', {'class': 'vacancy-description-list-item'})
             experience = description[0].text.replace("Требуемый опыт работы ", "")
             salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
-            schedule = description[1].text
+            schedule1 = description[1].text
+            parts = schedule1.split(', ')
+            schedule = parts[0]
+            employment = parts[1] if len(parts) > 1 else None
             address_element = data1.find('div', {
                 'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-paragraph-2-regular___VO638_3-0-9'})
             address = address_element.find('p').text if address_element else None

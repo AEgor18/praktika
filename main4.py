@@ -6,19 +6,22 @@ mydb = mysql.connector.connect(
     host = 'localhost',
     user = 'root',
     passwd = '(Promo456)',
-    database = 'vacancies'
+    database = 'vacancies_hh'
 )
 
 mycursor = mydb.cursor()
-mycursor.execute("""CREATE TABLE IF NOT EXISTS vacancies (
-                id INTEGER PRIMARY KEY,
+# mycursor.execute('CREATE DATABASE vacancies_hh')
+mycursor.execute("""CREATE TABLE IF NOT EXISTS vacancies_new (
+                id INTEGER AUTO_INCREMENT PRIMARY KEY,
                 position VARCHAR(255),
                 company VARCHAR(255),
                 experience VARCHAR(255),
                 salary VARCHAR(255),
                 schedule VARCHAR(255),
+                employment VARCHAR(255),
                 address VARCHAR(255)
                 )""")
+
 
 text = 'python'
 items = 50
@@ -54,14 +57,17 @@ def array():
                     salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
                     description = data.find_all('p', {'class': 'vacancy-description-list-item'})
                     experience = description[0].text if description else "Не указано"
-                    schedule = description[1].text if len(description) > 1 else "Не указано"
+                    schedule1 = description[1].text
+                    parts = schedule1.split(', ')
+                    schedule = parts[0]
+                    employment = parts[1] if len(parts) > 1 else None
                     company = data1.find('span', {'class': 'bloko-header-section-2 bloko-header-section-2_lite'}).text
                     address_element = data1.find('div', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-paragraph-2-regular___VO638_3-0-9'})
                     address = address_element.find('p').text if address_element else None
                     if address is None:
                         address1_element = data1.find('span', {'class': 'magritte-text___tkzIl_4-1-4'})
                         address = address1_element.find('span').text if address1_element else None
-                    yield position, company, experience.replace('Требуемый опыт работы:', ''), salary, schedule, address
+                    yield position, company, experience.replace('Требуемый опыт работы:', ''), salary, schedule, employment,  address
                     vacancy_count += 1
                     if vacancy_count >= items:
                         break
@@ -70,9 +76,11 @@ def array():
             pass
 
 for item in array():
-    position, company, experience, salary, schedule, address = item
-    mycursor.execute("INSERT INTO vacancies (position, company, experience, salary, schedule, address) VALUES (%s, %s, %s, %s, %s, %s)",
-                     (position, company, experience, salary, schedule, address))
+    position, company, experience, salary, schedule, employment, address = item
+    mycursor.execute("INSERT INTO vacancies_new (position, company, experience, salary, schedule, employment, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                     (position, company, experience, salary, schedule, employment, address))
 mydb.commit()
+# mycursor.execute("ALTER TABLE vacancies AUTO_INCREMENT = 1")
+# mydb.commit()
 # mycursor.execute("TRUNCATE TABLE vacancies")
 # mydb.commit()
