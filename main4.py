@@ -24,35 +24,36 @@ def hh():
     return pages[-1]
 max_page = hh()
 
-list_card_url = []
-# def get_url():
-for page in range(1):
-    request = requests.get(f'{url}&page={page}', headers=headers)
-    soup = bs(request.text, 'lxml')
-    data = soup.find_all('div',  {'class': 'vacancy-search-item__card'})
-    for i in data:
-        card_url = i.find('a').get('href')
-        list_card_url.append(card_url)
 
-for card_url in  list_card_url:
-    response = requests.get(card_url, headers=headers)
-    soup = bs(response.text, 'lxml')
-    data = soup.find('div', {'class': 'wrapper-flat--H4DVL_qLjKLCo1sytcNI'})
-    data1 = soup.find('div', {'class': 'vacancy-company-redesigned'})
-    if data:
-        title = data.find('h1', {'class': 'bloko-header-section-1'}).text
-        salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
-        description = data.find_all('p', {'class': 'vacancy-description-list-item'})
-        experience = description[0].text
-        busyness = description[1].text
-        company = data1.find('span', {'class': 'bloko-header-section-2 bloko-header-section-2_lite'}).text
-        city_element = data1.find('div', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-paragraph-2-regular___VO638_3-0-9'})
-        city = city_element.find('p').text if city_element else None
-        if city is None:
-            city1_element = data1.find('span', {'class': 'magritte-text___tkzIl_4-1-4'})
-            city = city1_element.find('span').text if city1_element else None
-        print(title, salary, experience, busyness, company, city)
+def get_url():
+    for page in range(max_page):
+        request = requests.get(f'{url}&page={page}', headers=headers)
+        soup = bs(request.text, 'lxml')
+        data = soup.find_all('div',  {'class': 'vacancy-search-item__card'})
+        for i in data:
+            card_url = i.find('a').get('href')
+            yield card_url
 
+def array():
+    for card_url in get_url():
+        response = requests.get(card_url, headers=headers)
+        soup = bs(response.text, 'lxml')
+        data = soup.find('div', {'class': 'wrapper-flat--H4DVL_qLjKLCo1sytcNI'})
+        data1 = soup.find('div', {'class': 'vacancy-company-redesigned'})
+        if data:
+            title = data.find('h1', {'class': 'bloko-header-section-1'}).text
+            salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
+            description = data.find_all('p', {'class': 'vacancy-description-list-item'})
+            experience = description[0].text
+            busyness = description[1].text
+            company = data1.find('span', {'class': 'bloko-header-section-2 bloko-header-section-2_lite'}).text
+            address_element = data1.find('div', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-paragraph-2-regular___VO638_3-0-9'})
+            address = address_element.find('p').text if address_element else None
+            if address is None:
+                address1_element = data1.find('span', {'class': 'magritte-text___tkzIl_4-1-4'})
+                address = address1_element.find('span').text if address1_element else None
+            print(title, salary, experience, busyness, company, address)
+array()
 
 
 
