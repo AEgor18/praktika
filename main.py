@@ -31,7 +31,6 @@ def hh_jobs(last_page):
         # print(result.status_code)
         soup = bs(result.text, 'lxml')
         results = soup.find_all('div',  {'class': 'vacancy-search-item__card'})
-        print(results)
         for result in results:
             try:
                 title = result.find('a').text

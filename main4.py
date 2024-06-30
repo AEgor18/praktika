@@ -39,18 +39,20 @@ for card_url in  list_card_url:
     soup = bs(response.text, 'lxml')
     data = soup.find('div', {'class': 'wrapper-flat--H4DVL_qLjKLCo1sytcNI'})
     data1 = soup.find('div', {'class': 'vacancy-company-redesigned'})
-    if data != None:
-        try:
-            title = data.find('h1', {'class': 'bloko-header-section-1'}).text
-            salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
-            description = data.find_all('p', {'class': 'vacancy-description-list-item'})
-            experience = description[0].text
-            busyness = description[1].text
-            company = data1.find('span', {'class': 'bloko-header-section-2 bloko-header-section-2_lite'}).text
-            address = data1.find('div', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-paragraph-2-regular___VO638_3-0-9'}).text
-            print(title, salary, experience,  busyness, company, address)
-        except:
-            print(title, salary, experience,  busyness, company, 'Адрес не указан')
+    if data:
+        title = data.find('h1', {'class': 'bloko-header-section-1'}).text
+        salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
+        description = data.find_all('p', {'class': 'vacancy-description-list-item'})
+        experience = description[0].text
+        busyness = description[1].text
+        company = data1.find('span', {'class': 'bloko-header-section-2 bloko-header-section-2_lite'}).text
+        city_element = data1.find('div', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-paragraph-2-regular___VO638_3-0-9'})
+        city = city_element.find('p').text if city_element else None
+        if city is None:
+            city1_element = data1.find('span', {'class': 'magritte-text___tkzIl_4-1-4'})
+            city = city1_element.find('span').text if city1_element else None
+        print(title, salary, experience, busyness, company, city)
+
 
 
 
