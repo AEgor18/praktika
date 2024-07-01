@@ -74,12 +74,12 @@ def array():
             page += 1
         except:
             pass
-
-for item in array():
-    position, company, experience, salary, schedule, employment, address = item
-    mycursor.execute("INSERT INTO vacancies_new (position, company, experience, salary, schedule, employment, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-                     (position, company, experience, salary, schedule, employment, address))
-mydb.commit()
+array()
+# for item in array():
+#     position, company, experience, salary, schedule, employment, address = item
+#     mycursor.execute("INSERT INTO vacancies_new (position, company, experience, salary, schedule, employment, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+#                      (position, company, experience, salary, schedule, employment, address))
+# mydb.commit()
 # mycursor.execute("ALTER TABLE vacancies AUTO_INCREMENT = 1")
 # mydb.commit()
 # mycursor.execute("TRUNCATE TABLE vacancies")
