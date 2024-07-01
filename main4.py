@@ -74,7 +74,7 @@ def array():
             page += 1
         except:
             pass
-array()
+
 # for item in array():
 #     position, company, experience, salary, schedule, employment, address = item
 #     mycursor.execute("INSERT INTO vacancies_new (position, company, experience, salary, schedule, employment, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
