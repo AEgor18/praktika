@@ -42,13 +42,14 @@ def array():
     while resume_count < items:
         for i in data:
             try:
-                position = i.find('h3', 'bloko-header-section-3').text
-                experience = i.find('div', {'class': 'content--uYCSpLiTsRfIZJe2wiYy'}).text
+                position = i.find('a', 'bloko-link').text
+                experience = i.find('div', {'class': 'content--uYCSpLiTsRfIZJe2wiYy'}).text.replace(' ', ' ')
                 salary_str = i.find('div', {'class': 'bloko-text bloko-text_strong'}).text
                 currency = salary_str[-2:].replace(' Br', 'BR').replace(' ₽', 'R').replace(' €', 'EU').replace(' ₸', 'T').replace(' $', 'DOL').replace(' ₼', 'AZN')
                 salary = salary_str[:-2].replace(' ', '')
                 last_job = i.find('span', {'class': 'bloko-text bloko-text_strong'}).text
                 yield position, experience, int(salary), currency, last_job
+                # print(position, experience, int(salary), currency, last_job)
                 resume_count += 1
                 if resume_count >= items:
                     break
@@ -72,3 +73,8 @@ def array():
 # mydb.commit()
 # mycursor.execute("TRUNCATE TABLE resume")
 # mydb.commit()
+
+mycursor.execute('SELECT * FROM resume')
+myresult = mycursor.fetchall()
+for row in myresult:
+    print(row)

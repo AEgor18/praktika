@@ -11,14 +11,14 @@ mydb = mysql.connector.connect(
 
 mycursor = mydb.cursor()
 # mycursor.execute('CREATE DATABASE vacancies_hh')
-mycursor.execute("""CREATE TABLE IF NOT EXISTS vacancies_new (
+mycursor.execute("""CREATE TABLE IF NOT EXISTS hh_vacancies2 (
                 id INTEGER AUTO_INCREMENT PRIMARY KEY,
                 position VARCHAR(255),
                 company VARCHAR(255),
                 experience VARCHAR(255),
                 salary VARCHAR(255),
-                schedule VARCHAR(255),
                 employment VARCHAR(255),
+                schedule VARCHAR(255),
                 address VARCHAR(255)
                 )""")
 
@@ -54,7 +54,7 @@ def array():
                 data1 = soup.find('div', {'class': 'vacancy-company-redesigned'})
                 if data:
                     position = data.find('h1', {'class': 'bloko-header-section-1'}).text
-                    salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text
+                    salary = data.find('span', {'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text.replace(' ', ' ')
                     description = data.find_all('p', {'class': 'vacancy-description-list-item'})
                     experience = description[0].text if description else "Не указано"
                     schedule1 = description[1].text
@@ -68,6 +68,7 @@ def array():
                         address1_element = data1.find('span', {'class': 'magritte-text___tkzIl_4-1-4'})
                         address = address1_element.find('span').text if address1_element else None
                     yield position, company, experience.replace('Требуемый опыт работы:', ''), salary, schedule, employment,  address
+                    # print(position, company, experience.replace('Требуемый опыт работы:', ''), salary, schedule, employment,  address)
                     vacancy_count += 1
                     if vacancy_count >= items:
                         break
@@ -76,11 +77,16 @@ def array():
             pass
 
 # for item in array():
-#     position, company, experience, salary, schedule, employment, address = item
-#     mycursor.execute("INSERT INTO vacancies_new (position, company, experience, salary, schedule, employment, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-#                      (position, company, experience, salary, schedule, employment, address))
+#     position, company, experience, salary, employment, schedule, address = item
+#     mycursor.execute("INSERT INTO hh_vacancies2 (position, company, experience, salary, employment, schedule, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+#                      (position, company, experience, salary, employment, schedule, address))
 # mydb.commit()
 # mycursor.execute("ALTER TABLE vacancies AUTO_INCREMENT = 1")
 # mydb.commit()
 # mycursor.execute("TRUNCATE TABLE vacancies")
 # mydb.commit()
+#
+# mycursor.execute('SELECT * FROM hh_vacancies2 WHERE schedule = "полный день"')
+# myresult = mycursor.fetchall()
+# for row in myresult:
+#     print(row)
