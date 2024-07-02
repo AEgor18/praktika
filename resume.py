@@ -31,7 +31,9 @@ mycursor.execute("""CREATE TABLE IF NOT EXISTS resume (
                 )""")
 
 
-
+mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+mycursor.execute("TRUNCATE TABLE resume")
+mydb.commit()
 def array():
     resume_count = 0
     page = 0
@@ -62,9 +64,7 @@ def array():
         soup = bs(response.text, 'lxml')
         data = soup.find_all('div', {'class': 'wrapper--eiknuhp1KcZ2hosUJO7g'})
 
-mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
-mycursor.execute("TRUNCATE TABLE resume")
-mydb.commit()
+
 for item in array():
     position, experience, salary, currency, last_job = item
     mycursor.execute("INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
@@ -75,5 +75,8 @@ mydb.commit()
 
 mycursor.execute('SELECT * FROM resume')
 myresult = mycursor.fetchall()
-for row in myresult:
-    print(row)
+print(myresult)
+
+mycursor.execute('SELECT * FROM resume WHERE salary > 50000')
+myresult1 = mycursor.fetchall()
+print(myresult1)
