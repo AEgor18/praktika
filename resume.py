@@ -2,7 +2,7 @@ import mysql.connector
 from bs4 import BeautifulSoup as bs
 import requests
 
-text = 'python'
+text = input()
 items = 50
 headers = {
     'Host': 'hh.ru',
@@ -62,17 +62,16 @@ def array():
         soup = bs(response.text, 'lxml')
         data = soup.find_all('div', {'class': 'wrapper--eiknuhp1KcZ2hosUJO7g'})
 
+mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+mycursor.execute("TRUNCATE TABLE resume")
+mydb.commit()
+for item in array():
+    position, experience, salary, currency, last_job = item
+    mycursor.execute("INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
+                     (position, experience, salary, currency, last_job))
 
-# for item in array():
-#     position, experience, salary, currency, last_job = item
-#     mycursor.execute("INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
-#                      (position, experience, salary, currency, last_job))
-#
-# mydb.commit()
-# mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
-# mydb.commit()
-# mycursor.execute("TRUNCATE TABLE resume")
-# mydb.commit()
+mydb.commit()
+
 
 mycursor.execute('SELECT * FROM resume')
 myresult = mycursor.fetchall()

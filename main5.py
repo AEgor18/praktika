@@ -1,9 +1,11 @@
 import mysql.connector
 from bs4 import BeautifulSoup as bs
 import requests
+import time
 
-text = 'курьер'
-items = 20
+text = input()
+items = 50
+max_pages = 5  # Максимальное количество страниц для просмотра
 headers = {
     'Host': 'hh.ru',
     'User-Agent': 'Yandex',
@@ -12,45 +14,66 @@ headers = {
     'Accept-Encoding': 'gzip, deflate, br'
 }
 
-def get_url(page):
-    url = f'https://hh.ru/search/resume?exp_period=all_time&logic=normal&no_magic=true&order_by=relevance&ored_clusters=true&pos=full_text&search_period=0&text={text}&items_on_page=100&page={page}'
-    response = requests.get(url, headers=headers)
-    soup = bs(response.text, 'lxml')
-    data = soup.find_all('div', {'class': 'wrapper--eiknuhp1KcZ2hosUJO7g'})
-    for i in data:
-        card_url = 'https://hh.ru' + i.find('a').get('href')
-        yield card_url
+mydb = mysql.connector.connect(
+    host='localhost',
+    user='root',
+    passwd='(Promo456)',
+    database='hh_resume'
+)
+
+mycursor = mydb.cursor(buffered=True)  # Использование buffered=True
+
+# mycursor.execute('CREATE DATABASE hh_resume')
+mycursor.execute("""CREATE TABLE IF NOT EXISTS resume (
+                id INTEGER AUTO_INCREMENT PRIMARY KEY,
+                position VARCHAR(255),
+                experience VARCHAR(255),
+                salary INTEGER,
+                currency VARCHAR(255),
+                last_job VARCHAR(255)
+                )""")
 
 def array():
-    vacancy_count = 0
+    resume_count = 0
     page = 0
-    while vacancy_count < items:
-        try:
-            for card_url in get_url(page):
-                response = requests.get(card_url, headers=headers)
-                soup = bs(response.text, 'lxml')
-                data = soup.find('div', {'class': 'resume-applicant'})
-                if data:
-                    position = data.find('h2', {'class': 'bloko-header-2'}).text
-                    specialization = 'Не указано' if data.find('li', {
-                        'class': 'resume-block__specialization'}) is None else data.find('li', {
-                        'class': 'resume-block__specialization'}).text
-                    experience = data.find('span', {'class': 'resume-block__title-text resume-block__title-text_sub'}).text.replace('Опыт работы ', '')
-                    gender1 = data.find('div', {'class': 'resume-header-title'}).find('p').text
-                    parts = gender1.split(', ')
-                    gender = parts[0]
-                    age = parts[1].replace('года', '').replace('год', '').replace('лет', '')
-                    employment1 = data.find('div', {'class': 'resume-block-container'}).text
-                    parts1 = employment1.split(':')
-                    employment = parts1[2].replace('График работы', '')
-                    schedule = parts1[3]
-                    print(position, specialization, experience, gender, age, employment, schedule)
-                    # print(position, specialization)
-                    vacancy_count += 1
-                    if vacancy_count >= items:
-                        break
-            page += 1
-        except:
-            pass
+    session = requests.Session()  # Использование requests.Session()
+    while resume_count < items and page < max_pages:
+        url = f'https://hh.ru/search/resume?text={text}&exp_period=all_time&logic=normal&pos=full_text&page={page}'
+        response = session.get(url, headers=headers)  # Использование session
+        soup = bs(response.text, 'lxml')
+        data = soup.select('div.wrapper--eiknuhp1KcZ2hosUJO7g')  # Использование soup.select()
+        time.sleep(0.2)  # Пауза между запросами
 
-array()
+        for i in data:
+            try:
+                position = i.select_one('a.bloko-link').text  # Использование select_one()
+                experience = i.select_one('div.content--uYCSpLiTsRfIZJe2wiYy').text.replace(' ', ' ')
+                salary_str = i.select_one('div.bloko-text.bloko-text_strong').text
+                currency = salary_str[-2:].replace(' Br', 'BR').replace(' ₽', 'R').replace(' €', 'EU').replace(' ₸', 'T').replace(' $', 'DOL').replace(' ₼', 'AZN')
+                salary = salary_str[:-2].replace(' ', '')
+                last_job = i.select_one('span.bloko-text.bloko-text_strong').text
+                yield position, experience, int(salary), currency, last_job
+                resume_count += 1
+                if resume_count >= items:
+                    break
+            except:
+                pass
+
+        page += 1
+
+mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+mycursor.execute("TRUNCATE TABLE resume")
+mydb.commit()
+
+data_to_insert = list(array())
+mycursor.executemany(
+    "INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
+    data_to_insert
+)  # Использование executemany()
+
+mydb.commit()
+
+mycursor.execute('SELECT * FROM resume')
+myresult = mycursor.fetchall()
+for row in myresult:
+    print(row)
