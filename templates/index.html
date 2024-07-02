@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Практика</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/resumes.css') }}">
+</head>
+<body>
+    <div class="hh">
+        <form method="POST">
+            <input class="hh-input" type="text" name="text" placeholder="Введите название профессии" required>
+            <button class="hh-button" type="submit">Поиск</button>
+        </form>
+    </div>
+
+    <div class="results">
+        <p class="results-p">Результаты по запросу:</p>
+        <p class="results-p1">{{ text }}</p>
+        <p class="results-p2">Найдено:</p>
+        <p class="results-p1">{{ resumes|length }} резюме</p>
+    </div>
+
+    <div class="change">
+        <a class="change-resume" href="resumes.html"><button class="resume-button">Резюме</button></a>
+        <a class="change-vacancies" href="vacanies.html"><button class="vacancies-button">Вакансии</button></a>
+    </div>
+
+    {% for resume in resumes %}
+        <div class="card">
+            <p class="position">{{ resume[1] }}</p>
+            <div class="oplata">
+                <p class="salary">{{ resume[3] }}</p>
+                <p class="currency">{{ resume[4] }}</p>
+            </div>
+            <div class="opit">
+                <p class="opit1">Опыт работы:</p>
+                <p class="experience">{{ resume[2] }}</p>
+            </div>
+            <div class="job">
+                <p class="last">Последнее место работы:</p>
+                <p class="last-job">{{ resume[5] }}</p>
+            </div>
+        </div>
+    {% endfor %}
+
+</body>
+</html>
