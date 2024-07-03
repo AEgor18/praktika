@@ -29,13 +29,16 @@ mydb_vacancy = mysql.connector.connect(
 
 mycursor_resume = mydb_resume.cursor()
 mycursor_vacancy = mydb_vacancy.cursor()
-mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
-mycursor_resume.execute("TRUNCATE TABLE resume")
-mydb_resume.commit()
-mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
 mycursor_vacancy.execute("TRUNCATE TABLE hh_vacancies2")
+mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
 mydb_vacancy.commit()
+mycursor_resume.execute("TRUNCATE TABLE resume")
+mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+mydb_resume.commit()
 def parse_resumes(text, items=50):
+    mycursor_resume.execute("TRUNCATE TABLE resume")
+    mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+    mydb_resume.commit()
     resume_count = 0
     page = 0
     while resume_count < items:
@@ -61,7 +64,10 @@ def parse_resumes(text, items=50):
                 pass
         page += 1
 
-def parse_vacancies(text, items=20):
+def parse_vacancies(text, items=30):
+    mycursor_vacancy.execute("TRUNCATE TABLE hh_vacancies2")
+    mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
+    mydb_vacancy.commit()
     def get_url(page):
         url = f'https://hh.ru/search/vacancy?text={text}&salary=&ored_clusters=true&page={page}'
         response = requests.get(url, headers=headers)
@@ -87,7 +93,7 @@ def parse_vacancies(text, items=20):
                             'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text.replace(
                             ' ', ' ')
                         description = data.find_all('p', {'class': 'vacancy-description-list-item'})
-                        experience = description[0].text if description else "Не указано"
+                        experience = description[0].text.replace(' 1-3 года', '1-3 года').replace(' 3-6 лет', '3-6 лет').replace(' более 6 лет', 'более 6 лет') if description else "Не указано"
                         schedule1 = description[1].text
                         parts = schedule1.split(', ')
                         schedule = parts[0]
@@ -130,17 +136,37 @@ def index():
     return render_template('index.html', resumes=resumes)
 
 @app.route('/vacancies', methods=['GET', 'POST'])
+@app.route('/vacancies', methods=['GET', 'POST'])
 def vacancies():
     if request.method == 'POST':
         text = request.form.get('text')
+        employment_filter = request.form.getlist('employment')
+        schedule_filter = request.form.getlist('schedule')
+        experience_filter = request.form.getlist('experience')
+
         parse_vacancies(text)
-        mycursor_vacancy.execute("SELECT * FROM hh_vacancies2 WHERE position LIKE %s", ('%' + text + '%',))
+
+        query = "SELECT * FROM hh_vacancies2 WHERE position LIKE %s"
+        query_params = ['%' + text + '%']
+
+        if employment_filter:
+            query += " AND employment IN ({})".format(', '.join(['%s'] * len(employment_filter)))
+            query_params.extend(employment_filter)
+        if schedule_filter:
+            query += " AND schedule IN ({})".format(', '.join(['%s'] * len(schedule_filter)))
+            query_params.extend(schedule_filter)
+        if experience_filter:
+            query += " AND experience IN ({})".format(', '.join(['%s'] * len(experience_filter)))
+            query_params.extend(experience_filter)
+
+        mycursor_vacancy.execute(query, query_params)
         vacancies = mycursor_vacancy.fetchall()
         return render_template('vacancies.html', vacancies=vacancies, text=text)
     else:
         mycursor_vacancy.execute("SELECT * FROM hh_vacancies2")
         vacancies = mycursor_vacancy.fetchall()
-    return render_template('vacancies.html', vacancies=vacancies)
+        return render_template('vacancies.html', vacancies=vacancies)
 
 if __name__ == '__main__':
     app.run(debug=True)
+
