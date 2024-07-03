@@ -144,14 +144,12 @@ body {
     background-color: #f3f2f2;
     transition: 0.5s;
 }
-.cards{
-    margin-left: 143px;
-}
+
 .card{
     background-color: #fff;
     margin-bottom: 30px ;
     width: 400px;
-    max-height: 240px;
+    max-height: 230px;
     border: 1px solid #bbbbbb;
     border-radius: 5px;
 }
@@ -233,20 +231,17 @@ body {
     display: flex;
 }
 
-.filters {
-    margin-top: 20px;
-}
 .filter {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    margin-left: 150px;
+    padding-bottom: 20px;
 }
 
 .filter-p{
     margin-left: 5px;
     font-size: 16px;
     margin-right: 8px;
+    cursor: pointer;
 }
 .results1 {
     margin-left: 443px;
@@ -254,4 +249,36 @@ body {
     text-align: center;
     margin-bottom: 20px;
     display: flex;
+}
+
+.cards{
+    margin-left: 114px;
+}
+
+.filters {
+    margin-top: 20px;
+    border: 1px solid #bbb;
+    margin-bottom: 10px;
+    margin-left: 150px;
+    padding: 20px;
+    max-height: 430px;
+    background-color: #fff;
+}
+
+.filter-p:hover{
+    color: #5c5b5b;
+    transition: 0.5s;
+}
+
+.filter-title{
+    margin-left: 150px;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.title-p {
+    font-weight: bold;
+    font-size: 20px;
+    margin-left: 2px;
+    color: rgb(44, 73, 204);
 }

@@ -28,14 +28,12 @@ mydb_vacancy = mysql.connector.connect(
 )
 
 mycursor_resume = mydb_resume.cursor()
-mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
-mycursor_resume.execute("TRUNCATE TABLE resume")
-mydb_resume.commit()
 mycursor_vacancy = mydb_vacancy.cursor()
-mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
-mycursor_vacancy.execute("TRUNCATE TABLE hh_vacancies2")
-mydb_resume.commit()
+
 def parse_resumes(text, items=50):
+    mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+    mycursor_resume.execute("TRUNCATE TABLE resume")
+    mydb_resume.commit()
     resume_count = 0
     page = 0
     while resume_count < items:
@@ -62,6 +60,9 @@ def parse_resumes(text, items=50):
         page += 1
 
 def parse_vacancies(text, items=20):
+    mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
+    mycursor_vacancy.execute("TRUNCATE TABLE hh_vacancies2")
+    mydb_vacancy.commit()
     def get_url(page):
         url = f'https://hh.ru/search/vacancy?text={text}&salary=&ored_clusters=true&page={page}'
         response = requests.get(url, headers=headers)
