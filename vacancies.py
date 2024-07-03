@@ -76,5 +76,3 @@ mydb.commit()
 
 mycursor.execute('SELECT * FROM hh_vacancies2')
 myresult = mycursor.fetchall()
-for row in myresult:
-    print(row)
