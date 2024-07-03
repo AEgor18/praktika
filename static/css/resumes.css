@@ -83,10 +83,9 @@ body {
 .results {
     font-size: 16px;
     text-align: center;
-    margin-right: 165px;
     margin-bottom: 20px;
     display: flex;
-    justify-content: center;
+    margin-left: 463px;
 }
 
 .results-p1 {
@@ -191,4 +190,12 @@ body {
 .vacancies-button:hover {
     background-color: #f3f2f2;
     transition: 0.5s;
+}
+
+.results1 {
+    margin-left: 423px;
+    font-size: 16px;
+    text-align: center;
+    margin-bottom: 20px;
+    display: flex;
 }

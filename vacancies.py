@@ -10,18 +10,6 @@ mydb = mysql.connector.connect(
 )
 
 mycursor = mydb.cursor()
-# mycursor.execute('CREATE DATABASE vacancies_hh')
-mycursor.execute("""CREATE TABLE IF NOT EXISTS hh_vacancies2 (
-                id INTEGER AUTO_INCREMENT PRIMARY KEY,
-                position VARCHAR(255),
-                company VARCHAR(255),
-                experience VARCHAR(255),
-                salary VARCHAR(255),
-                employment VARCHAR(255),
-                schedule VARCHAR(255),
-                address VARCHAR(255)
-                )""")
-
 mycursor.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
 mycursor.execute("TRUNCATE TABLE hh_vacancies2")
 mydb.commit()
