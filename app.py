@@ -93,7 +93,7 @@ def parse_vacancies(text, items=30):
                             'class': 'magritte-text___pbpft_3-0-9 magritte-text_style-primary___AQ7MW_3-0-9 magritte-text_typography-label-1-regular___pi3R-_3-0-9'}).text.replace(
                             ' ', ' ')
                         description = data.find_all('p', {'class': 'vacancy-description-list-item'})
-                        experience = description[0].text.replace(' 1-3 года', '1-3 года').replace(' 3-6 лет', '3-6 лет').replace(' более 6 лет', 'более 6 лет') if description else "Не указано"
+                        experience = description[0].text if description else "Не указано"
                         schedule1 = description[1].text
                         parts = schedule1.split(', ')
                         schedule = parts[0]
@@ -106,13 +106,13 @@ def parse_vacancies(text, items=30):
                         if address is None:
                             address1_element = data1.find('span', {'class': 'magritte-text___tkzIl_4-1-4'})
                             address = address1_element.find('span').text if address1_element else None
-                        yield position, company, experience.replace('Требуемый опыт работы:',
+                        yield position, company, experience.replace('Требуемый опыт работы: ',
                                                                     ''), salary, schedule, employment, address
                         # print(position, company, experience.replace('Требуемый опыт работы:', ''), salary, schedule, employment,  address)
                         vacancy_count += 1
                         if vacancy_count >= items:
                             break
-                page += 1
+                    page += 1
             except:
                 pass
 
@@ -136,16 +136,13 @@ def index():
     return render_template('index.html', resumes=resumes)
 
 @app.route('/vacancies', methods=['GET', 'POST'])
-@app.route('/vacancies', methods=['GET', 'POST'])
 def vacancies():
     if request.method == 'POST':
         text = request.form.get('text')
         employment_filter = request.form.getlist('employment')
         schedule_filter = request.form.getlist('schedule')
         experience_filter = request.form.getlist('experience')
-
         parse_vacancies(text)
-
         query = "SELECT * FROM hh_vacancies2 WHERE position LIKE %s"
         query_params = ['%' + text + '%']
 
@@ -161,6 +158,7 @@ def vacancies():
 
         mycursor_vacancy.execute(query, query_params)
         vacancies = mycursor_vacancy.fetchall()
+        query_params.clear()
         return render_template('vacancies.html', vacancies=vacancies, text=text)
     else:
         mycursor_vacancy.execute("SELECT * FROM hh_vacancies2")
