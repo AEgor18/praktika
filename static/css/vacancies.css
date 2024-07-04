@@ -100,19 +100,14 @@ body {
 .change{
     display: flex;
     justify-content: center;
-    margin-right: 360px;
-    margin-bottom: 20px;
-}
-
-.change{
-    display: flex;
-    justify-content: center;
     margin-right: 330px;
     margin-bottom: 20px;
 }
 
-.resume-button {
+.change-resume {
     background-color: rgb(54, 114, 245);
+    padding-left: 13px;
+    padding-top: 9px;
     color: #fff;
     font-weight: bold;
     width: 90px;
@@ -122,12 +117,17 @@ body {
     border: 1px solid #fff;
 }
 
-.resume-button:hover {
+.change-resume:hover {
     background-color: rgb(49, 101, 212);
     transition: 0.5s;
 }
+.change-resume:visited {
+    color: #fff;
+}
 
-.vacancies-button {
+.change-vacancies {
+    padding-left: 4px;
+    padding-top: 9px;
     margin-left: 10px;
     background-color: #fff;
     color: rgb(54, 114, 245);
@@ -139,11 +139,14 @@ body {
     border: 1px solid rgb(54, 114, 245);
 }
 
-.vacancies-button:hover {
+.change-vacancies:hover {
     background-color: #f3f2f2;
     transition: 0.5s;
 }
 
+.change-vacancies:visited {
+    color: rgb(54, 114, 245);
+}
 .card{
     background-color: #fff;
     margin-bottom: 30px ;
