@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, url_for, redirect
 import mysql.connector
 from bs4 import BeautifulSoup as bs
 import requests
@@ -77,8 +77,9 @@ def parse_vacancies(text, items=30):
             for i in data:
                 card_url = i.find('a').get('href')
                 yield card_url
-        except Exception as e:
-            print(f'Ошибка при получении URL вакансий: {e}')
+        except:
+            pass
+
 
     def array():
         vacancy_count = 0
@@ -125,19 +126,25 @@ def parse_vacancies(text, items=30):
             "INSERT INTO hh_vacancies2 (position, company, experience, salary, employment, schedule, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (position, company, experience, salary, employment, schedule, address))
     mydb_vacancy.commit()
-@app.route('/', methods=['GET', 'POST'])
+
+@app.route('/', methods=['GET'])
+def main():
+    return render_template('main.html')
+@app.route('/process', methods=['POST'])
+def process():
+    text = request.form['text']
+    parse_resumes(text)
+    return redirect(url_for('index', text=text))
+@app.route('/index', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
+    text = request.args.get('text', '')
     if request.method == 'POST':
         text = request.form.get('text')
         parse_resumes(text)
-        mycursor_resume.execute("SELECT * FROM resume")
-        #WHERE position LIKE %s", ('%' + text + '%',)
-        resumes = mycursor_resume.fetchall()
-        return render_template('index.html', resumes=resumes, text=text)
-    else:
-        mycursor_resume.execute("SELECT * FROM resume")
-        resumes = mycursor_resume.fetchall()
-    return render_template('index.html', resumes=resumes)
+    mycursor_resume.execute("SELECT * FROM resume")
+    resumes = mycursor_resume.fetchall()
+    return render_template('index.html', resumes=resumes, text=text)
 
 
 @app.route('/vacancies', methods=['GET', 'POST'])
