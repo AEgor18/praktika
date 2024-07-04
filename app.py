@@ -69,13 +69,16 @@ def parse_vacancies(text, items=30):
     mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
     mydb_vacancy.commit()
     def get_url(page):
-        url = f'https://hh.ru/search/vacancy?text={text}&salary=&ored_clusters=true&page={page}'
-        response = requests.get(url, headers=headers)
-        soup = bs(response.text, 'lxml')
-        data = soup.find_all('div', {'class': 'vacancy-search-item__card'})
-        for i in data:
-            card_url = i.find('a').get('href')
-            yield card_url
+        try:
+            url = f'https://hh.ru/search/vacancy?text={text}&salary=&ored_clusters=true&page={page}'
+            response = requests.get(url, headers=headers)
+            soup = bs(response.text, 'lxml')
+            data = soup.find_all('div', {'class': 'vacancy-search-item__card'})
+            for i in data:
+                card_url = i.find('a').get('href')
+                yield card_url
+        except Exception as e:
+            print(f'Ошибка при получении URL вакансий: {e}')
 
     def array():
         vacancy_count = 0
