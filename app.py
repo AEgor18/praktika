@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, url_for, redirect
+from flask import Flask, render_template, request,  url_for, redirect
 import mysql.connector
 from bs4 import BeautifulSoup as bs
 import requests
@@ -35,7 +35,7 @@ mydb_vacancy.commit()
 mycursor_resume.execute("TRUNCATE TABLE resume")
 mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
 mydb_resume.commit()
-def parse_resumes(text, items=50):
+def parse_resumes(text, min_salary=None, max_salary=None, items=50):
     mycursor_resume.execute("TRUNCATE TABLE resume")
     mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
     mydb_resume.commit()
@@ -52,8 +52,12 @@ def parse_resumes(text, items=50):
                 experience = i.find('div', {'class': 'content--uYCSpLiTsRfIZJe2wiYy'}).text.replace(' ', ' ')
                 salary_str = i.find('div', {'class': 'bloko-text bloko-text_strong'}).text
                 currency = salary_str[-2:]
-                salary = salary_str[:-2].replace(' ', '')
+                salary = int(salary_str[:-2].replace(' ', ''))
                 last_job = i.find('span', {'class': 'bloko-text bloko-text_strong'}).text
+                if min_salary and salary < min_salary:
+                    continue
+                if max_salary and salary > max_salary:
+                    continue
                 mycursor_resume.execute("INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
                                  (position, experience, int(salary), currency, last_job))
                 mydb_resume.commit()
@@ -130,21 +134,38 @@ def parse_vacancies(text, items=30):
 @app.route('/', methods=['GET'])
 def main():
     return render_template('main.html')
+
 @app.route('/process', methods=['POST'])
 def process():
     text = request.form['text']
     parse_resumes(text)
     return redirect(url_for('index', text=text))
-@app.route('/index', methods=['GET', 'POST'])
+
+
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    text = request.args.get('text', '')
     if request.method == 'POST':
         text = request.form.get('text')
-        parse_resumes(text)
-    mycursor_resume.execute("SELECT * FROM resume")
-    resumes = mycursor_resume.fetchall()
-    return render_template('index.html', resumes=resumes, text=text)
+        min_salary = request.form.get('min_salary', type=int)
+        max_salary = request.form.get('max_salary', type=int)
+        parse_resumes(text, min_salary, max_salary)
+        query = "SELECT * FROM resume WHERE TRUE"
+        query_params = []
+        if min_salary is not None:
+            query += " AND salary >= %s"
+            query_params.append(min_salary)
+        if max_salary is not None:
+            query += " AND salary <= %s"
+            query_params.append(max_salary)
+
+        mycursor_resume.execute(query, query_params)
+        resumes = mycursor_resume.fetchall()
+        return render_template('index.html', resumes=resumes, text=text)
+    else:
+        mycursor_resume.execute("SELECT * FROM resume")
+        resumes = mycursor_resume.fetchall()
+        return render_template('index.html', resumes=resumes)
+
 
 
 @app.route('/vacancies', methods=['GET', 'POST'])
