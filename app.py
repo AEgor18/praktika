@@ -130,13 +130,15 @@ def index():
     if request.method == 'POST':
         text = request.form.get('text')
         parse_resumes(text)
-        mycursor_resume.execute("SELECT * FROM resume WHERE position LIKE %s", ('%' + text + '%',))
+        mycursor_resume.execute("SELECT * FROM resume")
+        #WHERE position LIKE %s", ('%' + text + '%',)
         resumes = mycursor_resume.fetchall()
         return render_template('index.html', resumes=resumes, text=text)
     else:
         mycursor_resume.execute("SELECT * FROM resume")
         resumes = mycursor_resume.fetchall()
     return render_template('index.html', resumes=resumes)
+
 
 @app.route('/vacancies', methods=['GET', 'POST'])
 def vacancies():
@@ -146,27 +148,33 @@ def vacancies():
         schedule_filter = request.form.getlist('schedule')
         experience_filter = request.form.getlist('experience')
         parse_vacancies(text)
-        query = "SELECT * FROM hh_vacancies2 WHERE position LIKE %s"
-        query_params = ['%' + text + '%']
 
+        query = "SELECT * FROM hh_vacancies2"
+        query_params = []
+        filters = []
         if employment_filter:
-            query += " AND employment IN ({})".format(', '.join(['%s'] * len(employment_filter)))
+            filters.append("employment IN ({})".format(', '.join(['%s'] * len(employment_filter))))
             query_params.extend(employment_filter)
         if schedule_filter:
-            query += " AND schedule IN ({})".format(', '.join(['%s'] * len(schedule_filter)))
+            filters.append("schedule IN ({})".format(', '.join(['%s'] * len(schedule_filter))))
             query_params.extend(schedule_filter)
         if experience_filter:
-            query += " AND experience IN ({})".format(', '.join(['%s'] * len(experience_filter)))
+            filters.append("experience IN ({})".format(', '.join(['%s'] * len(experience_filter))))
             query_params.extend(experience_filter)
+
+        if filters:
+            query += " WHERE " + " AND ".join(filters)
 
         mycursor_vacancy.execute(query, query_params)
         vacancies = mycursor_vacancy.fetchall()
         query_params.clear()
+        filters.clear()
         return render_template('vacancies.html', vacancies=vacancies, text=text)
     else:
         mycursor_vacancy.execute("SELECT * FROM hh_vacancies2")
         vacancies = mycursor_vacancy.fetchall()
         return render_template('vacancies.html', vacancies=vacancies)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
