@@ -83,8 +83,6 @@ def parse_vacancies(text, items=30):
                 yield card_url
         except:
             pass
-
-
     def array():
         vacancy_count = 0
         page = 0
@@ -144,6 +142,7 @@ def process():
 
 @app.route('/index', methods=['GET', 'POST'])
 def index():
+    text = request.args.get('text')
     if request.method == 'POST':
         text = request.form.get('text')
         min_salary = request.form.get('min_salary', type=int)
@@ -165,6 +164,7 @@ def index():
         mycursor_resume.execute("SELECT * FROM resume")
         resumes = mycursor_resume.fetchall()
         return render_template('index.html', resumes=resumes)
+
 
 
 
