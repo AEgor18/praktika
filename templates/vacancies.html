@@ -105,12 +105,11 @@
         </div>
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Получаем все чекбоксы
                 var employmentCheckboxes = document.querySelectorAll('input[name="employment"]');
                 var scheduleCheckboxes = document.querySelectorAll('input[name="schedule"]');
                 var experienceCheckboxes = document.querySelectorAll('input[name="experience"]');
 
-                // Функция для блокировки/разблокировки чекбоксов
+
                 function toggleCheckboxes(checkboxes, current, state) {
                     checkboxes.forEach(function(checkbox) {
                         if (checkbox !== current) {
@@ -119,30 +118,25 @@
                     });
                 }
 
-                // Обработчик событий для чекбоксов "Тип занятости"
+
                 employmentCheckboxes.forEach(function(checkbox) {
                     checkbox.addEventListener('change', function() {
                         if (this.id === 'full_employment' && this.checked) {
-                            // Блокируем "Частичная занятость"
                             document.getElementById('part_employment').disabled = true;
                         } else if (this.id === 'part_employment' && this.checked) {
-                            // Блокируем "Полная занятость"
                             document.getElementById('full_employment').disabled = true;
                         } else {
-                            // Если ни один не выбран, разблокируем оба
                             toggleCheckboxes(employmentCheckboxes, this, false);
                         }
                     });
                 });
 
-                // Обработчик событий для чекбоксов "График"
                 scheduleCheckboxes.forEach(function(checkbox) {
                     checkbox.addEventListener('change', function() {
                         toggleCheckboxes(scheduleCheckboxes, this, this.checked);
                     });
                 });
 
-                // Обработчик событий для чекбоксов "Опыт"
                 experienceCheckboxes.forEach(function(checkbox) {
                     checkbox.addEventListener('change', function() {
                         toggleCheckboxes(experienceCheckboxes, this, this.checked);
