@@ -22,8 +22,8 @@
         <p class="results-p1">{{ resumes|length }} резюме</p>
     </div>
     <div class="change">
-        <a class="change-resume" href="{{ url_for('index') }}"><button class="resume-button">Резюме</button></a>
-        <a class="change-vacancies" href="{{ url_for('vacancies') }}"><button class="vacancies-button">Вакансии</button></a>
+        <a class="change-resume" href="{{ url_for('index') }}">Резюме</a>
+        <a class="change-vacancies" href="{{ url_for('vacancies') }}">Вакансии</a>
     </div>
     {% for resume in resumes %}
         <div class="card">
