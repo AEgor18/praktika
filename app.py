@@ -13,32 +13,25 @@ headers = {
     'Accept-Encoding': 'gzip, deflate, br'
 }
 
-mydb_resume = mysql.connector.connect(
-    host='localhost',
+mydb = mysql.connector.connect(
+    host='127.1.1.1',
     user='root',
     passwd='(Promo456)',
-    database='hh_resume'
+    database='hh_ru'
 )
 
-mydb_vacancy = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    passwd='(Promo456)',
-    database='vacancies_hh'
-)
 
-mycursor_resume = mydb_resume.cursor()
-mycursor_vacancy = mydb_vacancy.cursor()
-mycursor_vacancy.execute("TRUNCATE TABLE hh_vacancies2")
-mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
-mydb_vacancy.commit()
-mycursor_resume.execute("TRUNCATE TABLE resume")
-mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
-mydb_resume.commit()
+mycursor = mydb.cursor()
+mycursor.execute("TRUNCATE TABLE vacancies")
+mycursor.execute("ALTER TABLE vacancies AUTO_INCREMENT = 1")
+mydb.commit()
+mycursor.execute("TRUNCATE TABLE resume")
+mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+mydb.commit()
 def parse_resumes(text, min_salary=None, max_salary=None, items=50):
-    mycursor_resume.execute("TRUNCATE TABLE resume")
-    mycursor_resume.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
-    mydb_resume.commit()
+    mycursor.execute("TRUNCATE TABLE resume")
+    mycursor.execute("ALTER TABLE resume AUTO_INCREMENT = 1")
+    mydb.commit()
     resume_count = 0
     page = 0
     while resume_count < items:
@@ -58,9 +51,9 @@ def parse_resumes(text, min_salary=None, max_salary=None, items=50):
                     continue
                 if max_salary and salary > max_salary:
                     continue
-                mycursor_resume.execute("INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
+                mycursor.execute("INSERT INTO resume (position, experience, salary, currency, last_job) VALUES (%s, %s, %s, %s, %s)",
                                  (position, experience, int(salary), currency, last_job))
-                mydb_resume.commit()
+                mydb.commit()
                 resume_count += 1
                 if resume_count >= items:
                     break
@@ -69,9 +62,9 @@ def parse_resumes(text, min_salary=None, max_salary=None, items=50):
         page += 1
 
 def parse_vacancies(text, items=30):
-    mycursor_vacancy.execute("TRUNCATE TABLE hh_vacancies2")
-    mycursor_vacancy.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
-    mydb_vacancy.commit()
+    mycursor.execute("TRUNCATE TABLE vacancies")
+    mycursor.execute("ALTER TABLE vacancies AUTO_INCREMENT = 1")
+    mydb.commit()
     def get_url(page):
         try:
             url = f'https://hh.ru/search/vacancy?text={text}&salary=&ored_clusters=true&page={page}'
@@ -124,10 +117,10 @@ def parse_vacancies(text, items=30):
 
     for item in array():
         position, company, experience, salary, employment, schedule, address = item
-        mycursor_vacancy.execute(
-            "INSERT INTO hh_vacancies2 (position, company, experience, salary, employment, schedule, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+        mycursor.execute(
+            "INSERT INTO vacancies (position, company, experience, salary, employment, schedule, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (position, company, experience, salary, employment, schedule, address))
-    mydb_vacancy.commit()
+    mydb.commit()
 
 @app.route('/', methods=['GET'])
 def main():
@@ -157,15 +150,13 @@ def index():
             query += " AND salary <= %s"
             query_params.append(max_salary)
 
-        mycursor_resume.execute(query, query_params)
-        resumes = mycursor_resume.fetchall()
+        mycursor.execute(query, query_params)
+        resumes = mycursor.fetchall()
         return render_template('index.html', resumes=resumes, text=text)
     else:
-        mycursor_resume.execute("SELECT * FROM resume")
-        resumes = mycursor_resume.fetchall()
+        mycursor.execute("SELECT * FROM resume")
+        resumes = mycursor.fetchall()
         return render_template('index.html', resumes=resumes)
-
-
 
 
 @app.route('/vacancies', methods=['GET', 'POST'])
@@ -177,7 +168,7 @@ def vacancies():
         experience_filter = request.form.getlist('experience')
         parse_vacancies(text)
 
-        query = "SELECT * FROM hh_vacancies2"
+        query = "SELECT * FROM vacancies"
         query_params = []
         filters = []
         if employment_filter:
@@ -193,14 +184,14 @@ def vacancies():
         if filters:
             query += " WHERE " + " AND ".join(filters)
 
-        mycursor_vacancy.execute(query, query_params)
-        vacancies = mycursor_vacancy.fetchall()
+        mycursor.execute(query, query_params)
+        vacancies = mycursor.fetchall()
         query_params.clear()
         filters.clear()
         return render_template('vacancies.html', vacancies=vacancies, text=text)
     else:
-        mycursor_vacancy.execute("SELECT * FROM hh_vacancies2")
-        vacancies = mycursor_vacancy.fetchall()
+        mycursor.execute("SELECT * FROM vacancies")
+        vacancies = mycursor.fetchall()
         return render_template('vacancies.html', vacancies=vacancies)
 
 

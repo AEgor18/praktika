@@ -13,10 +13,10 @@ headers = {
 }
 
 mydb = mysql.connector.connect(
-    host = 'localhost',
+    host = '127.1.1.1',
     user = 'root',
     passwd = '(Promo456)',
-    database = 'hh_resume'
+    database = 'hh_ru'
 )
 
 mycursor = mydb.cursor()

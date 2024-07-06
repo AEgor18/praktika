@@ -3,15 +3,15 @@ from bs4 import BeautifulSoup as bs
 import requests
 
 mydb = mysql.connector.connect(
-    host = 'localhost',
+    host = '127.1.1.1',
     user = 'root',
     passwd = '(Promo456)',
-    database = 'vacancies_hh'
+    database = 'hh_ru'
 )
 
 mycursor = mydb.cursor()
-mycursor.execute("ALTER TABLE hh_vacancies2 AUTO_INCREMENT = 1")
-mycursor.execute("TRUNCATE TABLE hh_vacancies2")
+mycursor.execute("ALTER TABLE vacancies AUTO_INCREMENT = 1")
+mycursor.execute("TRUNCATE TABLE vacancies")
 mydb.commit()
 
 text = input()
@@ -69,10 +69,10 @@ def array():
 
 for item in array():
     position, company, experience, salary, employment, schedule, address = item
-    mycursor.execute("INSERT INTO hh_vacancies2 (position, company, experience, salary, employment, schedule, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+    mycursor.execute("INSERT INTO vacancies (position, company, experience, salary, employment, schedule, address) VALUES (%s, %s, %s, %s, %s, %s, %s)",
                      (position, company, experience, salary, employment, schedule, address))
 mydb.commit()
 
 
-mycursor.execute('SELECT * FROM hh_vacancies2')
+mycursor.execute('SELECT * FROM vacancies')
 myresult = mycursor.fetchall()
